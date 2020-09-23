@@ -3,6 +3,7 @@ import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:self_motivate/components/heart.dart';
 import 'package:self_motivate/common/hash.dart';
+import 'package:self_motivate/entities/quote_entities.dart';
 
 class QuotePage extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class QuotePage extends StatefulWidget {
 
 class _QuotePageState extends State<QuotePage>
     with SingleTickerProviderStateMixin {
-  //Vertical drag details
+  // Vertical drag details
   DragStartDetails startVerticalDragDetails;
   DragUpdateDetails updateVerticalDragDetails;
 
@@ -47,8 +48,10 @@ class _QuotePageState extends State<QuotePage>
     String keyHash = generateMd5(data['quoteText']);
     print('[quote.dart] KEY HASH ---> $keyHash');
     final prefs = await SharedPreferences.getInstance();
+    QuoteEntity quoteEntity = QuoteEntity(
+        quoteText: data['quoteText'], quoteAuthor: data['quoteAuthor']);
     isFav
-        ? prefs.setStringList(keyHash, [data['quoteText'], data['quoteAuthor']])
+        ? prefs.setString(keyHash, quoteEntity.toJSONString())
         : prefs.remove(keyHash);
   }
 
