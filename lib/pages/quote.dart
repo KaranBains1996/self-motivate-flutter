@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:self_motivate/components/nav_drawer.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:self_motivate/components/heart.dart';
+import 'package:self_motivate/common/hash.dart';
 
 class QuotePage extends StatefulWidget {
   @override
@@ -40,15 +42,35 @@ class _QuotePageState extends State<QuotePage>
     super.dispose();
   }
 
+  void hearted(bool isFav) async {
+    print('[quote.dart] $isFav');
+    String keyHash = generateMd5(data['quoteText']);
+    print('[quote.dart] KEY HASH ---> $keyHash');
+    final prefs = await SharedPreferences.getInstance();
+    isFav
+        ? prefs.setStringList(keyHash, [data['quoteText'], data['quoteAuthor']])
+        : prefs.remove(keyHash);
+  }
+
   @override
   Widget build(BuildContext context) {
     data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      drawer: NavDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.grey[800],
         title: Text('Self Motivate'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.list,
+              size: 30.0,
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/saved');
+            },
+          )
+        ],
       ),
       body: GestureDetector(
         onVerticalDragStart: (dragDetails) {
@@ -88,9 +110,11 @@ class _QuotePageState extends State<QuotePage>
                       child: Text(
                         data['quoteText'],
                         style: TextStyle(
-                            fontSize: 24.0,
+                            fontSize: 28.0,
                             color: Colors.grey[100],
-                            backgroundColor: Colors.red),
+                            backgroundColor: Colors.red,
+                            fontFamily: 'PTSans',
+                            fontStyle: FontStyle.italic),
                       ),
                     ),
                     SizedBox(
@@ -101,10 +125,18 @@ class _QuotePageState extends State<QuotePage>
                         child: Text(
                           '- ${data['quoteAuthor'].length > 0 ? data['quoteAuthor'] : 'Anonymous'}',
                           style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.grey[100],
-                              backgroundColor: Colors.red),
-                        ))
+                            fontSize: 24.0,
+                            color: Colors.grey[100],
+                            backgroundColor: Colors.red,
+                            fontFamily: 'PTSans',
+                          ),
+                        )),
+                    SizedBox(
+                      height: 100,
+                    ),
+                    Heart(
+                      hearted: hearted,
+                    )
                   ],
                 ),
               ),

@@ -32,6 +32,5 @@ class _LoadingState extends State<LoadingPage> {
           color: Colors.white,
           size: 50.0,
         )));
-    ;
   }
 }
