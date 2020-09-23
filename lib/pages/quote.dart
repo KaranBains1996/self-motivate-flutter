@@ -1,82 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:self_motivate/components/nav_drawer.dart';
+import 'package:share/share.dart';
 
 class QuotePage extends StatefulWidget {
   @override
   _QuotePageState createState() => _QuotePageState();
 }
 
-class _QuotePageState extends State<QuotePage> {
+class _QuotePageState extends State<QuotePage>
+    with SingleTickerProviderStateMixin {
   //Vertical drag details
   DragStartDetails startVerticalDragDetails;
   DragUpdateDetails updateVerticalDragDetails;
 
+  AnimationController _controller;
+  Animation<Offset> _offsetAnimation;
+
   Map data = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.0, 0.50),
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticIn,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-        drawer: NavDrawer(),
-        appBar: AppBar(
-          backgroundColor: Colors.grey[800],
-          title: Text('Self Motivate'),
-        ),
-        body: GestureDetector(
-          onVerticalDragStart: (dragDetails) {
-            startVerticalDragDetails = dragDetails;
-          },
-          onVerticalDragUpdate: (dragDetails) {
-            updateVerticalDragDetails = dragDetails;
-          },
-          onVerticalDragEnd: (endDetails) {
-            double dx = updateVerticalDragDetails.globalPosition.dx -
-                startVerticalDragDetails.globalPosition.dx;
-            double dy = updateVerticalDragDetails.globalPosition.dy -
-                startVerticalDragDetails.globalPosition.dy;
-            double velocity = endDetails.primaryVelocity;
+      drawer: NavDrawer(),
+      appBar: AppBar(
+        backgroundColor: Colors.grey[800],
+        title: Text('Self Motivate'),
+      ),
+      body: GestureDetector(
+        onVerticalDragStart: (dragDetails) {
+          startVerticalDragDetails = dragDetails;
+        },
+        onVerticalDragUpdate: (dragDetails) {
+          updateVerticalDragDetails = dragDetails;
+        },
+        onVerticalDragEnd: (endDetails) {
+          double dx = updateVerticalDragDetails.globalPosition.dx -
+              startVerticalDragDetails.globalPosition.dx;
+          double dy = updateVerticalDragDetails.globalPosition.dy -
+              startVerticalDragDetails.globalPosition.dy;
+          double velocity = endDetails.primaryVelocity;
 
-            //Convert values to be positive
-            if (dx < 0) dx = -dx;
-            if (dy < 0) dy = -dy;
+          //Convert values to be positive
+          if (dx < 0) dx = -dx;
+          if (dy < 0) dy = -dy;
 
-            if (velocity < 0) {
-              Navigator.pushReplacementNamed(context, '/');
-            } else {
-              print('swipe down');
-            }
-          },
-          child: Container(
-            color: Colors.grey[900],
-            padding: EdgeInsets.fromLTRB(20, 80, 20, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    data['quoteText'],
-                    style: TextStyle(
-                        fontSize: 24.0,
-                        color: Colors.grey[100],
-                        backgroundColor: Colors.red),
-                  ),
+          if (velocity < 0) {
+            Navigator.pushReplacementNamed(context, '/');
+          } else {
+            print('swipe down');
+          }
+        },
+        child: Container(
+          color: Colors.grey[900],
+          padding: EdgeInsets.fromLTRB(20, 80, 20, 0),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                flex: 8,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        data['quoteText'],
+                        style: TextStyle(
+                            fontSize: 24.0,
+                            color: Colors.grey[100],
+                            backgroundColor: Colors.red),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          '- ${data['quoteAuthor'].length > 0 ? data['quoteAuthor'] : 'Anonymous'}',
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.grey[100],
+                              backgroundColor: Colors.red),
+                        ))
+                  ],
                 ),
-                SizedBox(
-                  height: 40,
-                ),
-                Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '- ${data['quoteAuthor'].length > 0 ? data['quoteAuthor'] : 'Anonymous'}',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.grey[100],
-                          backgroundColor: Colors.red),
-                    ))
-              ],
-            ),
+              ),
+              Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: SlideTransition(
+                      position: _offsetAnimation,
+                      child: Icon(
+                        Icons.arrow_upward,
+                        color: Colors.grey[400],
+                        size: 30.0,
+                      ),
+                    ),
+                  ))
+            ],
           ),
-        ));
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Share.share('${data['quoteText']} - ${data['quoteAuthor']}');
+        },
+        child: Icon(
+          Icons.share,
+          color: Colors.grey[100],
+        ),
+        backgroundColor: Colors.grey[800],
+      ),
+    );
   }
 }
