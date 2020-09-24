@@ -9,16 +9,16 @@ class SavedQuotes extends StatefulWidget {
 
 class _SavedQuotesState extends State<SavedQuotes> {
   var quotes = new List<QuoteEntity>();
+  SharedPreferences prefs;
 
   void getSavedQuotes() async {
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     Set<String> keys = prefs.getKeys();
-    print('[saved_quotes] $keys');
     var quoteList = new List<QuoteEntity>();
     keys.forEach((key) {
-      print(prefs.get(key));
       QuoteEntity quoteEntity = QuoteEntity();
       quoteEntity.parseJSON(prefs.get(key));
+      quoteEntity.key = key;
       quoteList.add(quoteEntity);
     });
     setState(() {
@@ -32,6 +32,41 @@ class _SavedQuotesState extends State<SavedQuotes> {
     getSavedQuotes();
   }
 
+  Future<void> _showMyDialog(String key) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete quote'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to delete this quote?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Yes'),
+              onPressed: () {
+                prefs.remove(key);
+                getSavedQuotes();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,10 +77,35 @@ class _SavedQuotesState extends State<SavedQuotes> {
         body: ListView.builder(
             itemCount: quotes.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                leading: Icon(Icons.list),
-                trailing: Text(quotes[index].quoteAuthor),
-                title: Text(quotes[index].quoteText),
+              return Column(
+                children: [
+                  ListTile(
+                    title: Column(
+                      children: [
+                        Text(
+                          quotes[index].quoteText,
+                          // overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        )
+                      ],
+                    ),
+                    subtitle: Text(quotes[index].quoteAuthor.compareTo('') != 0
+                        ? quotes[index].quoteAuthor
+                        : 'Anonymous'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete_forever),
+                      color: Colors.grey[800],
+                      onPressed: () {
+                        _showMyDialog(quotes[index].key);
+                      },
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.grey,
+                  )
+                ],
               );
             }));
   }

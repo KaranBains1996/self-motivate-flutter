@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 class QuoteEntity {
+  String key;
   String quoteText;
   String quoteAuthor;
 
-  QuoteEntity({this.quoteText, this.quoteAuthor});
+  QuoteEntity({this.key, this.quoteText, this.quoteAuthor});
 
   String toJSONString() {
     return '{"quoteText":"$quoteText","quoteAuthor": "$quoteAuthor"}';
