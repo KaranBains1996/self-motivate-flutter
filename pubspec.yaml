@@ -1,4 +1,4 @@
-name: self_motivate
+name: Self Motivate
 description: Web app which shows and allows sharing of the most inspiring expressions of mankind.
 
 # The following line prevents the package from being accidentally published to
@@ -37,6 +37,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.8.0"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
