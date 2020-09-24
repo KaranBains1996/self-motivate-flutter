@@ -5,6 +5,7 @@ import 'package:self_motivate/pages/saved_quotes.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     initialRoute: '/',
     routes: {
       '/': (context) => LoadingPage(),
