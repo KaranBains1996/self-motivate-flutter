@@ -16,7 +16,6 @@ class QuoteSvc {
       Map data = jsonDecode(response.body.replaceAll(r"\'", "'"));
       this.quoteText = data['quoteText'];
       this.quoteAuthor = data['quoteAuthor'];
-      print(data);
     } catch (ex) {
       print(ex);
     }

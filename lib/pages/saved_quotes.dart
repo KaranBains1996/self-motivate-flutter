@@ -74,39 +74,44 @@ class _SavedQuotesState extends State<SavedQuotes> {
           backgroundColor: Colors.grey[800],
           title: Text('Saved Quotes'),
         ),
-        body: ListView.builder(
-            itemCount: quotes.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Column(
-                children: [
-                  ListTile(
-                    title: Column(
-                      children: [
-                        Text(
-                          quotes[index].quoteText,
-                          // overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        )
-                      ],
+        body: Container(
+          color: Colors.grey[900],
+          child: ListView.builder(
+              itemCount: quotes.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Column(
+                        children: [
+                          Text(
+                            quotes[index].quoteText,
+                            style: TextStyle(color: Colors.grey[300]),
+                          ),
+                          SizedBox(
+                            height: 10.0,
+                          )
+                        ],
+                      ),
+                      subtitle: Text(
+                          quotes[index].quoteAuthor.compareTo('') != 0
+                              ? quotes[index].quoteAuthor
+                              : 'Anonymous',
+                          style: TextStyle(color: Colors.grey[300])),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete_forever),
+                        color: Colors.grey[300],
+                        onPressed: () {
+                          _showMyDialog(quotes[index].key);
+                        },
+                      ),
                     ),
-                    subtitle: Text(quotes[index].quoteAuthor.compareTo('') != 0
-                        ? quotes[index].quoteAuthor
-                        : 'Anonymous'),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete_forever),
-                      color: Colors.grey[800],
-                      onPressed: () {
-                        _showMyDialog(quotes[index].key);
-                      },
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.grey,
-                  )
-                ],
-              );
-            }));
+                    Divider(
+                      color: Colors.grey,
+                    )
+                  ],
+                );
+              }),
+        ));
   }
 }

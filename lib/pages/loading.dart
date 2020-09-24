@@ -26,11 +26,11 @@ class _LoadingState extends State<LoadingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blue[900],
+        backgroundColor: Colors.grey[900],
         body: Center(
-            child: SpinKitFadingCube(
+            child: SpinKitPouringHourglass(
           color: Colors.white,
-          size: 50.0,
+          size: 100.0,
         )));
   }
 }

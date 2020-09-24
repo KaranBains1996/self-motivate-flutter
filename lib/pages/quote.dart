@@ -59,16 +59,29 @@ class _QuotePageState extends State<QuotePage>
   Widget build(BuildContext context) {
     data = data.isNotEmpty ? data : ModalRoute.of(context).settings.arguments;
 
+    if (data == null ||
+        data['quoteText'] == null ||
+        data['quoteAuthor'] == null) {
+      Navigator.pushReplacementNamed(context, '/');
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[800],
-        title: Text('Self Motivate'),
+        title: Text(
+          'self.motivate',
+          style: TextStyle(
+              fontFamily: 'PTSans',
+              fontWeight: FontWeight.bold,
+              letterSpacing: 5.0),
+        ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.list,
               size: 30.0,
             ),
+            tooltip: 'Saved quotes',
             onPressed: () {
               Navigator.pushNamed(context, '/saved');
             },
@@ -83,6 +96,10 @@ class _QuotePageState extends State<QuotePage>
           updateVerticalDragDetails = dragDetails;
         },
         onVerticalDragEnd: (endDetails) {
+          if (updateVerticalDragDetails == null ||
+              startVerticalDragDetails == null) {
+            return;
+          }
           double dx = updateVerticalDragDetails.globalPosition.dx -
               startVerticalDragDetails.globalPosition.dx;
           double dy = updateVerticalDragDetails.globalPosition.dy -
@@ -105,55 +122,63 @@ class _QuotePageState extends State<QuotePage>
           child: Column(
             children: <Widget>[
               Expanded(
-                flex: 8,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: Text(
-                        data['quoteText'],
-                        style: TextStyle(
-                            fontSize: 28.0,
-                            color: Colors.grey[100],
-                            backgroundColor: Colors.red,
-                            fontFamily: 'PTSans',
-                            fontStyle: FontStyle.italic),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 40,
-                    ),
-                    Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          '- ${data['quoteAuthor'].length > 0 ? data['quoteAuthor'] : 'Anonymous'}',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            color: Colors.grey[100],
-                            backgroundColor: Colors.red,
-                            fontFamily: 'PTSans',
+                flex: 6,
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Center(
+                          child: Text(
+                            data['quoteText'],
+                            style: TextStyle(
+                                fontSize: 28.0,
+                                color: Colors.grey[100],
+                                backgroundColor: Colors.red,
+                                fontFamily: 'PTSans',
+                                fontStyle: FontStyle.italic),
                           ),
-                        )),
-                    SizedBox(
-                      height: 100,
+                        ),
+                        SizedBox(
+                          height: 40,
+                        ),
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              '- ${data['quoteAuthor'].length > 0 ? data['quoteAuthor'] : 'Anonymous'}',
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                color: Colors.grey[100],
+                                backgroundColor: Colors.red,
+                                fontFamily: 'PTSans',
+                              ),
+                            )),
+                      ],
                     ),
-                    Heart(
-                      hearted: hearted,
-                    )
-                  ],
+                  ),
                 ),
               ),
               Expanded(
-                  flex: 2,
-                  child: Center(
-                    child: SlideTransition(
-                      position: _offsetAnimation,
-                      child: Icon(
-                        Icons.arrow_upward,
-                        color: Colors.grey[400],
-                        size: 30.0,
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Heart(
+                        hearted: hearted,
                       ),
-                    ),
+                      SizedBox(height: 20.0),
+                      Center(
+                        child: SlideTransition(
+                          position: _offsetAnimation,
+                          child: Icon(
+                            Icons.arrow_upward,
+                            color: Colors.grey[400],
+                            size: 30.0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ))
             ],
           ),
